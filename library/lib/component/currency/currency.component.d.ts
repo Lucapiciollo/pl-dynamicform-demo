@@ -1,0 +1,19 @@
+/**
+ * @format
+ * @author luca.piciollo
+ * @email lucapiciollo@gmail.com
+ * @create date 2022-11-18 12:55:27
+ * @modify date 2022-11-18 12:55:27
+ * @desc [description]
+ */
+import { ElementRef, Injector } from '@angular/core';
+import { BaseComponent } from '../base-component.component';
+import * as i0 from "@angular/core";
+export declare class CurrencyComponent extends BaseComponent {
+    protected injector: Injector;
+    protected element: ElementRef;
+    /************************************************************************************************************************************************************************ */
+    constructor(injector: Injector, element: ElementRef);
+    static ɵfac: i0.ɵɵFactoryDeclaration<CurrencyComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CurrencyComponent, "app-currency", never, {}, {}, never, never, false, never>;
+}

@@ -1,0 +1,39 @@
+{
+  "name": "pl-dynamicform",
+  "version": "1.0.1",
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0",
+    "@angular/forms": ">=19.0.0",
+    "@angular/material": ">=19.0.0",
+    "@ionic-native/camera": ">=5.0.0",
+    "moment": ">=2.29.0",
+    "@angular/cdk": ">=19.0.0",
+    "@angular/material-moment-adapter": ">=19.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "pl-core-utils-library": "latest",
+    "pl-decorator": "latest"
+  },
+  "sideEffects": false,
+  "assets": [
+    "./src/lib/styles/**/*.scss",
+    {
+      "glob": "**/*.scss",
+      "input": "./src/lib/styles",
+      "output": "./styles"
+    }
+  ],
+  "module": "fesm2022/pl-dynamicform.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./fesm2022/pl-dynamicform.mjs"
+    }
+  }
+}
