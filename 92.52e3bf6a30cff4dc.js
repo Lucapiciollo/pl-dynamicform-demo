@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkPlDynamicForm=self.webpackChunkPlDynamicForm||[]).push([[92],{8092(a,n,e){e.d(n,{DocumentScannerWeb:()=>c});var _=e(467),o=e(5083);class c extends o.E_{scanDocument(s){var t=this;return(0,_.A)(function*(){throw console.log(s),t.unimplemented("Not implemented on web.")})()}}}}]);

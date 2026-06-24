@@ -3,6 +3,13 @@
 > Libreria Angular per la creazione dichiarativa di form reattivi complessi.  
 > Niente template HTML manuali — descrivi il form in TypeScript, la libreria fa il resto.
 
+[![npm](https://img.shields.io/npm/v/pl-dynamicform.svg)](https://www.npmjs.com/package/pl-dynamicform)
+[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+🔗 **Demo live:** [https://lucapiciollo.github.io/pl-dynamicform-demo/](https://lucapiciollo.github.io/pl-dynamicform-demo/)  
+📦 **npm:** [https://www.npmjs.com/package/pl-dynamicform](https://www.npmjs.com/package/pl-dynamicform)
+
 ---
 
 ## Indice

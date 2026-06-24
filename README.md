@@ -1,6 +1,14 @@
 # PlDynamicForm
 
-> Libreria Angular per la generazione dichiarativa di form reattivi complessi, con supporto a temi, eventi, dati remoti paginati e schema JSON.
+> Libreria Angular per la generazione dichiarativa di form reattivi complessi.  
+> Supporto a temi, eventi, dati remoti paginati e schema JSON.
+
+[![npm](https://img.shields.io/npm/v/pl-dynamicform.svg)](https://www.npmjs.com/package/pl-dynamicform)
+[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+🔗 **Demo live:** [https://lucapiciollo.github.io/pl-dynamicform-demo/](https://lucapiciollo.github.io/pl-dynamicform-demo/)  
+📦 **npm:** [https://www.npmjs.com/package/pl-dynamicform](https://www.npmjs.com/package/pl-dynamicform)
 
 ---
 

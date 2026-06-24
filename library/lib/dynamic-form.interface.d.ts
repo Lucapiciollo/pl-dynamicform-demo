@@ -64,7 +64,8 @@ export declare enum TYPE_CONTROL_FORM {
     GROUP = 16,
     SORTACTION = 17,
     YEAR = 18,
-    RATING = 19
+    RATING = 19,
+    LABEL = 20
 }
 /***********************************************************************************************************************************
  * BASE TYPES
@@ -336,6 +337,8 @@ export type FormActionBase = {
     optionInputText?: TypeInputText;
     optionNumber?: TypeOptionNumber;
     optionDate?: TypeOptionDate;
+    dateFilter?: (date: Date) => boolean;
+    dateFilterCSS?: (date: Date) => string;
     optionTime?: TypeOptionTime;
     optionsTime?: TypeOptionTime;
     optionRating?: TypeOptionRating;

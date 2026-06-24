@@ -10,6 +10,13 @@ export interface DynamicFormRuntimeConfig {
     events?: Record<string, DynamicFieldEventHandler>;
     actions?: Record<string, DynamicActionEventHandler>;
     theme?: DynamicFormThemeConfig;
+    /** Opzioni per i `mat-form-field` della libreria (es. `appearance`, `subscriptSizing`). */
+    matFormField?: {
+        appearance?: 'fill' | 'outline';
+        subscriptSizing?: 'fixed' | 'dynamic';
+        floatLabel?: 'always' | 'auto';
+        hideRequiredMarker?: boolean;
+    };
 }
 /** Configurazione di default applicata se non viene fornita alcuna configurazione custom. */
 export declare const DYNAMIC_FORM_DEFAULT_CONFIG: DynamicFormRuntimeConfig;

@@ -7,7 +7,7 @@ Questa cartella è un repository separato pronto per la pubblicazione.
 | Percorso     | Contenuto                                                            |
 | ------------ | ------------------------------------------------------------------- |
 | /          | Demo compilata (GitHub Pages), base-href /pl-dynamicform-demo/              |
-| /library   | Pacchetto npm della libreria PlDynamicForm (FESM offuscati, livello: none) |
+| /library   | Pacchetto npm della libreria PlDynamicForm (FESM offuscati, livello: aggressive) |
 | index.html / 404.html | Entry SPA + fallback per il routing su Pages           |
 | README.md  | Documentazione della libreria (mostrata anche nel tab Readme della demo) |
 
