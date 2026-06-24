@@ -59,17 +59,17 @@ PlDynamicForm elimina la duplicazione nella scrittura di form Angular. Invece di
 
 **Funzionalità principali:**
 
-| Funzionalità             | Descrizione                                                                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 18 tipi di campo         | TEXT, NUMBER, CURRENCY, COMBO, COMBOPAGINATE, DATA, DATARANGE, DATETIME, TIME, YEAR, RATING, CHECKBOX, RADIOGROUP, TEXTAREA, FILE, ARRAYSTRING, BUTTON, GROUP |
-| Builder fluente generico | `DynamicFormBuilder.create(this)` inferisce il tipo del componente                                                                                            |
-| Contesto tipizzato       | factory `(ctx: TCtx) => FormAction` con autocompletamento pieno                                                                                               |
-| Tutti gli eventi         | `onChange`, `onInitialize`, `onFocus`, `onBlur`, `opened`, `closed`, `onSearch`, `onScrollEnd`                                                                |
-| Utility globale          | `getFormByName`, `getActionByName`, `setDefaultOptions`, `getSelectedOptions`, `formCompletion`                                                               |
-| Combo remote paginate    | infinite scroll, Signal-based, ricerca debounced                                                                                                              |
-| initialOptions + tag     | opzioni fisse in cima alla lista con badge SVG colorati                                                                                                       |
-| formCompletion Signal    | percentuale di completamento reattiva (totale + required)                                                                                                     |
-| Stato disabled corretto  | `new FormControl({ value, disabled: true })` per bloccare interazioni                                                                                         |
+| Funzionalità             | Descrizione                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 19 tipi di campo         | TEXT, NUMBER, CURRENCY, COMBO, COMBOPAGINATE, DATA, DATARANGE, DATETIME, TIME, YEAR, RATING, CHECKBOX, RADIOGROUP, TEXTAREA, FILE, ARRAYSTRING, SORTACTION, LABEL, GROUP |
+| Builder fluente generico | `DynamicFormBuilder.create(this)` inferisce il tipo del componente                                                                                                       |
+| Contesto tipizzato       | factory `(ctx: TCtx) => FormAction` con autocompletamento pieno                                                                                                          |
+| Tutti gli eventi         | `onChange`, `onInitialize`, `onFocus`, `onBlur`, `opened`, `closed`, `onSearch`, `onScrollEnd`                                                                           |
+| Utility globale          | `getFormByName`, `getActionByName`, `setDefaultOptions`, `getSelectedOptions`, `formCompletion`                                                                          |
+| Combo remote paginate    | infinite scroll, Signal-based, ricerca debounced                                                                                                                         |
+| initialOptions + tag     | opzioni fisse in cima alla lista con badge SVG colorati                                                                                                                  |
+| formCompletion Signal    | percentuale di completamento reattiva (totale + required)                                                                                                                |
+| Stato disabled corretto  | `new FormControl({ value, disabled: true })` per bloccare interazioni                                                                                                    |
 
 ---
 
@@ -83,20 +83,43 @@ npm install @angular/material @angular/cdk @angular/forms moment @angular/materi
 ### NgModule
 
 ```ts
-import { PlDynamicFormModule } from 'pl-dynamicform';
+import { PlDynamicFormModule, provideDynamicFormForModule } from 'pl-dynamicform';
 
-@NgModule({ imports: [PlDynamicFormModule] })
+@NgModule({
+  imports: [PlDynamicFormModule],
+  providers: [
+    ...provideDynamicFormForModule({
+      matFormField: { appearance: 'outline' }, // default: 'outline'
+    }),
+  ],
+})
 export class AppModule {}
 ```
 
 ### Standalone
 
 ```ts
-import { PlDynamicFormModule } from 'pl-dynamicform';
+import { PlDynamicFormModule, provideDynamicForm } from 'pl-dynamicform';
 
-@Component({ standalone: true, imports: [PlDynamicFormModule] })
-export class MyComponent {}
+// app.config.ts
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideDynamicForm({
+      matFormField: { appearance: 'fill' }, // override opzionale
+    }),
+    importProvidersFrom(PlDynamicFormModule),
+  ],
+};
 ```
+
+### Opzioni `matFormField`
+
+| Proprietà            | Tipo                   | Default     | Descrizione                                  |
+| -------------------- | ---------------------- | ----------- | -------------------------------------------- |
+| `appearance`         | `'outline' \| 'fill'`  | `'outline'` | Stile dei `mat-form-field` della libreria    |
+| `subscriptSizing`    | `'fixed' \| 'dynamic'` | `'fixed'`   | Gestione dello spazio per messaggi di errore |
+| `floatLabel`         | `'always' \| 'auto'`   | —           | Comportamento del label flottante            |
+| `hideRequiredMarker` | `boolean`              | —           | Nasconde l'asterisco obbligatorio            |
 
 ---
 
@@ -815,35 +838,37 @@ Campo che contiene un sotto-form annidato (espandibile o sempre visibile).
 
 Tutte le `FormAction` ereditano questi parametri:
 
-| Proprietà        | Tipo                                  | Descrizione                                                                                         |
-| ---------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `formName`       | `string`                              | **Identificatore univoco** del campo — usato da `getFormByName`                                     |
-| `title`          | `string`                              | Label visualizzata sopra il campo                                                                   |
-| `type`           | `TYPE_CONTROL_FORM`                   | Tipo del campo                                                                                      |
-| `formControl`    | `FormControl / FormArray / FormGroup` | Control Angular Reactive Forms                                                                      |
-| `disabled`       | `boolean`                             | Visivo — non blocca le interazioni; per bloccare usare `new FormControl({ value, disabled: true })` |
-| `readonly`       | `boolean`                             | Campo visibile ma non modificabile                                                                  |
-| `hidden`         | `boolean`                             | Nasconde il campo; il valore esiste comunque nel FormGroup                                          |
-| `placeholder`    | `string`                              | Testo segnaposto                                                                                    |
-| `hint`           | `string`                              | Testo di suggerimento sotto il campo                                                                |
-| `info`           | `{ msg: string; color: string }`      | Icona info con tooltip                                                                              |
-| `tipContent`     | `string`                              | Tooltip sull'intero campo                                                                           |
-| `resetButton`    | `boolean`                             | Mostra bottone X per azzerare il valore                                                             |
-| `autocomplete`   | `boolean`                             | Abilita autocomplete browser / ricerca inline combo                                                 |
-| `multiple`       | `boolean`                             | Selezione multipla (COMBO / COMBOPAGINATE)                                                          |
-| `css`            | `TypeCss`                             | Classi CSS custom, colore font, icone, ecc.                                                         |
-| `formGroup`      | `ConfigForm`                          | Sotto-form annidato                                                                                 |
-| `rows`           | `number`                              | Righe (TEXTAREA)                                                                                    |
-| `options`        | `Signal / Array`                      | Opzioni per COMBO, COMBOPAGINATE, RADIOGROUP                                                        |
-| `initialOptions` | `TypeComboOption`                     | Opzioni fisse sempre in cima alla lista                                                             |
-| `onChange`       | `DynamicFormOnChange`                 | Callback al cambio valore                                                                           |
-| `onInitialize`   | `DynamicFormOnInitialize`             | Callback all'init del campo                                                                         |
-| `onFocus`        | `DynamicFormFocusBlur`                | Callback al focus                                                                                   |
-| `onBlur`         | `DynamicFormFocusBlur`                | Callback alla perdita del focus                                                                     |
-| `opened`         | `DynamicFormOpenClose`                | Callback apertura pannello                                                                          |
-| `closed`         | `DynamicFormOpenClose`                | Callback chiusura pannello                                                                          |
-| `onSearch`       | `DynamicFormSearch`                   | Callback digitazione nella ricerca                                                                  |
-| `onScrollEnd`    | `DynamicFormScrollEnd`                | Callback fondo lista paginata                                                                       |
+| Proprietà        | Tipo                                  | Descrizione                                                                                                  |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `formName`       | `string`                              | **Identificatore univoco** del campo — usato da `getFormByName`                                              |
+| `title`          | `string`                              | Label visualizzata sopra il campo                                                                            |
+| `type`           | `TYPE_CONTROL_FORM`                   | Tipo del campo                                                                                               |
+| `formControl`    | `FormControl / FormArray / FormGroup` | Control Angular Reactive Forms                                                                               |
+| `disabled`       | `boolean`                             | Visivo — non blocca le interazioni; per bloccare usare `new FormControl({ value, disabled: true })`          |
+| `readonly`       | `boolean`                             | Campo visibile ma non modificabile                                                                           |
+| `hidden`         | `boolean`                             | Esclude il campo dal DOM; il valore esiste comunque nel `FormGroup` (equivalente a `css.hide = true`)        |
+| `placeholder`    | `string`                              | Testo segnaposto                                                                                             |
+| `hint`           | `string`                              | Testo di suggerimento sotto il campo                                                                         |
+| `info`           | `{ msg: string; color: string }`      | Icona info con tooltip                                                                                       |
+| `tipContent`     | `string`                              | Tooltip sull'intero campo                                                                                    |
+| `resetButton`    | `boolean`                             | Mostra bottone X per azzerare il valore                                                                      |
+| `autocomplete`   | `boolean`                             | Abilita autocomplete browser / ricerca inline combo                                                          |
+| `multiple`       | `boolean`                             | Selezione multipla (COMBO / COMBOPAGINATE)                                                                   |
+| `css`            | `TypeCss`                             | Classi CSS custom, colore font, icone, ecc.                                                                  |
+| `formGroup`      | `ConfigForm`                          | Sotto-form annidato                                                                                          |
+| `rows`           | `number`                              | Righe (TEXTAREA)                                                                                             |
+| `options`        | `Signal / Array`                      | Opzioni per COMBO, COMBOPAGINATE, RADIOGROUP                                                                 |
+| `initialOptions` | `TypeComboOption`                     | Opzioni fisse sempre in cima alla lista                                                                      |
+| `onChange`       | `DynamicFormOnChange`                 | Callback al cambio valore                                                                                    |
+| `onInitialize`   | `DynamicFormOnInitialize`             | Callback all'init del campo                                                                                  |
+| `onFocus`        | `DynamicFormFocusBlur`                | Callback al focus                                                                                            |
+| `onBlur`         | `DynamicFormFocusBlur`                | Callback alla perdita del focus                                                                              |
+| `opened`         | `DynamicFormOpenClose`                | Callback apertura pannello                                                                                   |
+| `closed`         | `DynamicFormOpenClose`                | Callback chiusura pannello                                                                                   |
+| `onSearch`       | `DynamicFormSearch`                   | Callback digitazione nella ricerca                                                                           |
+| `dateFilter`     | `(date: Date) => boolean`             | Funzione di filtraggio calendario — disabilita le date che restituiscono `false` (DATA, DATARANGE, DATETIME) |
+| `dateFilterCSS`  | `(date: Date) => string`              | Funzione che restituisce una classe CSS per personalizzare visivamente le date nel calendario                |
+| `onScrollEnd`    | `DynamicFormScrollEnd`                | Callback fondo lista paginata                                                                                |
 
 ---
 
@@ -1860,6 +1885,7 @@ ConfigForm = Array<Group>
 │   ├── Opzioni:    options, initialOptions, optionsDisabled, disabledOption
 │   ├── Paginate:   keyCombo, paging, pageSize, remoteData, totalCount, enableInfiniteScroll
 │   ├── Validazione: optionInputText, optionNumber, optionDate, optionsTime, optionRating
+│   ├── Filtro data: dateFilter, dateFilterCSS
 │   ├── Annidato:   formGroup (ConfigForm)
 │   └── Eventi:     onChange, onInitialize, onFocus, onBlur, opened, closed,
 │                   onSearch, onScrollEnd, action, onClose, onError

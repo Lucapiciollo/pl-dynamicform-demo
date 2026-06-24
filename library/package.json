@@ -1,6 +1,6 @@
 {
   "name": "pl-dynamicform",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "peerDependencies": {
     "@angular/common": ">=19.0.0",
     "@angular/core": ">=19.0.0",

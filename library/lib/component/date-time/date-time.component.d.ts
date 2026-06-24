@@ -11,6 +11,10 @@ export declare class DateTimeComponent extends BaseComponent implements OnInit {
         description: string;
     }[]>;
     selectedTime: string | null;
+    private _minDateToken;
+    private _maxDateToken;
+    get minDate(): string | null;
+    get maxDate(): string | null;
     constructor(injector: Injector, element: ElementRef);
     ngOnInit(): void;
     onDateChange(): void;

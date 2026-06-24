@@ -57,7 +57,7 @@
 
 **Caratteristiche principali:**
 
-- 🧩 **19 tipi di campo** — testo, numero, valuta, data, data-range, datetime, anno, orario, checkbox, radio, select, select paginata, file, textarea, array di stringhe, rating, sort, e altri
+- 🧩 **20 tipi di campo** — testo, numero, valuta, data, data-range, datetime, anno, orario, checkbox, radio, select, select paginata, file, textarea, array di stringhe, rating, sort, label e altri
 - 📋 **Doppia API** — `ConfigForm` (oggetti Angular) o `DynamicFormJsonSchema` (JSON puro, serializzabile)
 - 🎣 **Sistema eventi** — `onChange`, `onInitialize`, `opened`, `closed`, `action`, `remoteData` risolti per nome da un registro centralizzato
 - 📡 **Dati remoti paginati** — infinite scroll con Signal-based state management
@@ -127,6 +127,7 @@ import { provideDynamicFormForModule } from 'pl-dynamicform';
   providers: [
     ...provideDynamicFormForModule({
       theme: { name: 'modern-light' },
+      matFormField: { appearance: 'outline' }, // default: 'outline'
       events: {
         onNomeChange: ctx => console.log('nome cambiato:', ctx.formControl.value),
       },
@@ -150,6 +151,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideDynamicForm({
       theme: { name: 'modern-dark' },
+      matFormField: { appearance: 'fill' }, // opzionale, override del default
       events: {
         /* ... */
       },
@@ -417,6 +419,7 @@ export class RegistrazioneComponent {
 | `ARRAYSTRING`              | `ArrayStringComponent`         | Input che accumula un array di stringhe (chips) |
 | `RATING`                   | `RatingComponent`              | Valutazione a stelle (editabile o sola lettura) |
 | `SORTACTION`               | `SortActionComponent`          | Pulsante di ordinamento toggle                  |
+| `LABEL`                    | `LabelComponent`               | Etichetta testuale/HTML non interattiva         |
 | `GROUP`                    | —                              | Campo contenitore per form annidati             |
 
 ---
