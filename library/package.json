@@ -1,6 +1,6 @@
 {
   "name": "pl-dynamicform",
-  "version": "1.0.15",
+  "version": "1.0.48",
   "peerDependencies": {
     "@angular/common": ">=19.0.0",
     "@angular/core": ">=19.0.0",
@@ -9,7 +9,8 @@
     "@ionic-native/camera": ">=5.0.0",
     "moment": ">=2.29.0",
     "@angular/cdk": ">=19.0.0",
-    "@angular/material-moment-adapter": ">=19.0.0"
+    "@angular/material-moment-adapter": ">=19.0.0",
+    "ux-directives": ">=0.0.5"
   },
   "dependencies": {
     "tslib": "^2.3.0",

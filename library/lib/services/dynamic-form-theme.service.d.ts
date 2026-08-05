@@ -48,6 +48,19 @@ export declare class DynamicFormThemeService {
     getThemeConfig(): DynamicFormThemeConfig;
     /** Rimuove dall'elemento root tutte le classi CSS che iniziano con `df-theme-`. */
     private removePreviousThemeClasses;
+    /**
+     * Mappa i token --df-* verso i token Angular Material MDC / Mat come inline styles.
+     * Gli inline styles sul root element battono qualsiasi regola da stylesheet
+     * (incluse quelle iniettate a runtime dai componenti Angular Material figlio),
+     * garantendo coerenza visiva indipendentemente dall'ordine di rendering.
+     */
+    private injectMdcTokenMapping;
+    /**
+     * Inietta un <style> tag con regole scoped per il datepicker calendar.
+     * Necessario per l'OK button (mat-raised-button.mat-primary) che richiede
+     * scoping CSS specifico su .mat-primary. Iniettato una sola volta (guard su id).
+     */
+    private injectCalendarStyles;
     static ɵfac: i0.ɵɵFactoryDeclaration<DynamicFormThemeService, [null, { optional: true; }]>;
     static ɵprov: i0.ɵɵInjectableDeclaration<DynamicFormThemeService>;
 }

@@ -17,6 +17,15 @@ export interface DynamicFormRuntimeConfig {
         floatLabel?: 'always' | 'auto';
         hideRequiredMarker?: boolean;
     };
+    /**
+     * Formato numerico applicato ai campi decimali (`app-number`, `app-currency`).
+     * `decimalSeparator` forza il carattere ammesso/visualizzato per la parte decimale
+     * (es. `1000,10` con `','`, `1000.10` con `'.'`). Il valore del `FormControl` resta
+     * sempre un `number` JS standard (con `.`): la forzatura riguarda solo input/display.
+     */
+    numberFormat?: {
+        decimalSeparator?: ',' | '.';
+    };
 }
 /** Configurazione di default applicata se non viene fornita alcuna configurazione custom. */
 export declare const DYNAMIC_FORM_DEFAULT_CONFIG: DynamicFormRuntimeConfig;

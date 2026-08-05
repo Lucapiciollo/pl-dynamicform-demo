@@ -14,6 +14,7 @@
 
 ## Indice
 
+0. [Quick start per motori AI / agenti](#quick-start-per-motori-ai--agenti)
 1. [Panoramica](#panoramica)
 2. [Installazione e setup](#installazione-e-setup)
 3. [Concetti fondamentali](#concetti-fondamentali)
@@ -35,6 +36,7 @@
    - [TIME](#time)
    - [YEAR](#year)
    - [RATING](#rating)
+   - [COLOR](#color)
    - [FILE](#file)
    - [BUTTON](#button)
    - [GROUP](#group)
@@ -45,11 +47,110 @@
 11. [Combo statiche con tag e initialOptions](#combo-statiche-con-tag-e-initialoptions)
 12. [Combo paginata remota — guida completa](#combo-paginata-remota--guida-completa)
 13. [Rating — guida completa](#rating--guida-completa)
-14. [Azioni (DynamicFormActionButton)](#azioni-dynamicformactionbutton)
-15. [Layout gruppi](#layout-gruppi)
-16. [Utilizzo nel template](#utilizzo-nel-template)
-17. [Esempio completo reale](#esempio-completo-reale)
-18. [Riferimento tipi TypeScript](#riferimento-tipi-typescript)
+14. [Color — guida completa](#color--guida-completa)
+15. [Azioni (DynamicFormActionButton)](#azioni-dynamicformactionbutton)
+16. [Layout gruppi](#layout-gruppi)
+17. [Utilizzo nel template](#utilizzo-nel-template)
+18. [Esempio completo reale](#esempio-completo-reale)
+19. [Riferimento tipi TypeScript](#riferimento-tipi-typescript)
+
+---
+
+## Quick start per motori AI / agenti
+
+> Sezione pensata per assistenti di codice (Copilot, Cursor, Claude, ecc.). Copia il blocco qui sotto: contiene **tutto il necessario** per importare correttamente `pl-dynamicform` con **tema light**, senza dover ispezionare il codice della libreria.
+
+```markdown
+SEI UN ASSISTENTE CHE INTEGRA LA LIBRERIA ANGULAR `pl-dynamicform` (Angular 19, Material).
+Obiettivo: form reattivi dichiarativi, descritti in TypeScript, con TEMA LIGHT.
+
+## 1. INSTALLA
+
+npm install pl-dynamicform
+npm install @angular/material @angular/cdk @angular/material-moment-adapter moment ux-directives @ionic-native/camera bootstrap
+
+## 2. PROVIDER (scegli UNO)
+
+// NgModule (app.module.ts)
+import { PlDynamicFormModule, provideDynamicFormForModule } from 'pl-dynamicform';
+@NgModule({
+imports: [PlDynamicFormModule],
+providers: [...provideDynamicFormForModule({
+theme: { name: 'modern-light', mode: 'light' }, // TEMA LIGHT
+matFormField: { appearance: 'outline' },
+})],
+})
+export class AppModule {}
+
+// OPPURE standalone (app.config.ts)
+import { importProvidersFrom } from '@angular/core';
+import { PlDynamicFormModule, provideDynamicForm } from 'pl-dynamicform';
+export const appConfig = {
+providers: [
+importProvidersFrom(PlDynamicFormModule), // OBBLIGATORIO: inietta font/stili runtime
+provideDynamicForm({ theme: { name: 'modern-light', mode: 'light' }, matFormField: { appearance: 'outline' } }),
+],
+};
+
+## 3. STYLES (src/styles.scss) — OBBLIGATORIO
+
+// La lib inietta da sola Material Icons + token --df-\* (tema light di default).
+// Tu DEVI aggiungere SOLO: tema Material + griglia bootstrap.
+@use '@angular/material' as mat;
+@use 'bootstrap/scss/bootstrap-grid';
+html {
+@include mat.core();
+$theme: mat.define-theme((color: (theme-type: light, primary: mat.$azure-palette)));
+@include mat.all-component-themes($theme);
+}
+
+## 4. USO NEL COMPONENTE
+
+import { DynamicFormBuilder, TYPE_CONTROL_FORM, ConfigForm } from 'pl-dynamicform';
+import { FormControl, Validators } from '@angular/forms';
+
+config: ConfigForm = DynamicFormBuilder.create(this)
+.addGroup('Dati', ['col-12']) // 1° SEMPRE addGroup
+.addForm({ formName: 'nome', title: 'Nome', type: TYPE_CONTROL_FORM.TEXT,
+formControl: new FormControl('', Validators.required), class: ['col-md-6'] })
+.addForm({ formName: 'email', title: 'Email', type: TYPE_CONTROL_FORM.TEXT,
+formControl: new FormControl(''), class: ['col-md-6'] })
+.addActions([{ label: 'Salva', visible: true, action: () => this.save() }])
+.build();
+
+## 5. TEMPLATE
+
+<dynamic-form [configForm]="config"></dynamic-form>
+
+## REGOLE INVIOLABILI
+
+- addGroup() DEVE precedere addForm() (altrimenti errore runtime).
+- Layout a colonne = classi bootstrap nel campo `class` (es. ['col-md-6']); senza bootstrap-grid i campi si impilano.
+- NON aggiungere <link> per Material Icons: già iniettati dalla lib.
+- Tema light = default; per dark usa theme.name:'modern-dark', mode:'dark'.
+- Tipi campo (TYPE_CONTROL_FORM): TEXT, TEXTAREA, NUMBER, CURRENCY, CHECKBOX, RADIOGROUP, COMBO,
+  COMBOPAGINATE, ARRAYSTRING, DATA, DATARANGE, DATETIME, TIME, YEAR, RATING, COLOR, FILE, BUTTON, GROUP.
+```
+
+### Cosa deve sapere il motore AI sul `DynamicFormBuilder`
+
+- È l'API **fluente** per costruire la configurazione: `DynamicFormBuilder.create(this)` → `.addGroup(...)` → `.addForm(...)` → `.addActions(...)` → `.build()` che restituisce un `ConfigForm`.
+- `create(this)` passa il **contesto tipizzato**: dentro `addForm`/`addActions` puoi usare la forma factory `ctx => ({...})` per accedere a metodi/servizi del componente.
+- `forModel<TModel>().create(this)` vincola `formName` alle **chiavi del modello** (autocompletamento + errori a compile-time).
+- Ogni campo è un `FormAction`: `{ formName, type, formControl, title, class, eventi, opzioni }`.
+- I gruppi sono sezioni visive; il loro `class` e quello dei campi usano la **griglia bootstrap** (`col-*`).
+
+### Cosa deve sapere il motore AI sui servizi
+
+| Servizio / API                                                   | Ruolo                                                                                              | Serve azione manuale?   |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------- |
+| `PlDynamicFormModule` (costruttore)                              | All'avvio chiama `DynamicFormAssetsService.loadDefaultAssets()` + `DynamicFormThemeService.init()` | No: automatico          |
+| `DynamicFormAssetsService`                                       | Inietta nel `<head>` i font Material Icons/Symbols e gli stili globali runtime (`--df-*`)          | No                      |
+| `DynamicFormThemeService`                                        | Applica la classe `df-theme-modern-light` (o `-dark`) sul `body` e i custom token                  | No (config via `theme`) |
+| `provideDynamicForm()` / `...ForModule()`                        | Registra la configurazione runtime (`theme`, `matFormField`, `events`, `actions`)                  | Sì: passa la config     |
+| `getFormByName` / `getActionByName` / `formCompletion` (Utility) | Accesso runtime a campi, azioni e percentuale di completamento                                     | Solo se necessario      |
+
+> In sintesi per l'AI: **font e tema della lib sono automatici** (light di default); l'app host deve fornire solo **tema Material + griglia** in `styles.scss`, importare il modulo e usare il `DynamicFormBuilder`.
 
 ---
 
@@ -61,7 +162,7 @@ PlDynamicForm elimina la duplicazione nella scrittura di form Angular. Invece di
 
 | Funzionalità             | Descrizione                                                                                                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 19 tipi di campo         | TEXT, NUMBER, CURRENCY, COMBO, COMBOPAGINATE, DATA, DATARANGE, DATETIME, TIME, YEAR, RATING, CHECKBOX, RADIOGROUP, TEXTAREA, FILE, ARRAYSTRING, SORTACTION, LABEL, GROUP |
+| 20 tipi di campo         | TEXT, NUMBER, CURRENCY, COMBO, COMBOPAGINATE, DATA, DATARANGE, DATETIME, TIME, YEAR, RATING, COLOR, CHECKBOX, RADIOGROUP, TEXTAREA, FILE, ARRAYSTRING, SORTACTION, LABEL, GROUP |
 | Builder fluente generico | `DynamicFormBuilder.create(this)` inferisce il tipo del componente                                                                                                       |
 | Contesto tipizzato       | factory `(ctx: TCtx) => FormAction` con autocompletamento pieno                                                                                                          |
 | Tutti gli eventi         | `onChange`, `onInitialize`, `onFocus`, `onBlur`, `opened`, `closed`, `onSearch`, `onScrollEnd`                                                                           |
@@ -75,12 +176,47 @@ PlDynamicForm elimina la duplicazione nella scrittura di form Angular. Invece di
 
 ## Installazione e setup
 
+L'integrazione richiede **tre passi**: (1) installare i pacchetti, (2) configurare i provider Angular, (3) configurare gli stili (SCSS). I passi 1 e 2 non bastano da soli: senza il setup SCSS il form viene renderizzato ma **senza tema Material e senza layout a colonne**.
+
+### 1. Installazione pacchetti
+
 ```bash
+# Libreria
 npm install pl-dynamicform
-npm install @angular/material @angular/cdk @angular/forms moment @angular/material-moment-adapter
+
+# Peer dependencies obbligatorie
+npm install @angular/material @angular/cdk @angular/material-moment-adapter moment
+
+# Dipendenze runtime richieste dalla libreria
+npm install ux-directives @ionic-native/camera
+
+# Stili: tema Material + griglia per il layout a colonne
+npm install bootstrap
 ```
 
-### NgModule
+> `@angular/forms`, `@angular/common` e `@angular/core` sono già presenti in ogni progetto Angular.
+> `bootstrap` è usato **solo per la griglia** (`row`, `col-*`, `g-0`): puoi sostituirlo con qualunque sistema a griglia che esponga le stesse classi, ma senza una griglia i campi si impilano a tutta larghezza.
+
+| Pacchetto                                     | Perché serve                                                                                                            |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `@angular/material` + `@angular/cdk`          | Tutti i campi sono basati su componenti Material (`mat-form-field`, `mat-select`, `mat-datepicker`, `mat-tab-group`, …) |
+| `@angular/material-moment-adapter` + `moment` | Adapter delle date per i campi `DATA`, `DATARANGE`, `DATETIME`, `YEAR`                                                  |
+| `ux-directives`                               | Direttive UX importate internamente dal modulo                                                                          |
+| `@ionic-native/camera`                        | Provider `Camera` usato dal campo `FILE` (scan da fotocamera)                                                           |
+| `bootstrap`                                   | Griglia CSS per il layout a colonne dei gruppi/campi                                                                    |
+
+---
+
+### 2. Configurazione dei provider
+
+La libreria carica **automaticamente** (alla costruzione di `PlDynamicFormModule`):
+
+- i font **Material Icons / Material Symbols** (via `<link>` iniettato nel `<head>`);
+- gli **stili globali runtime** (CSS custom properties `--df-*` e regole per gli overlay Material/CDK).
+
+Quindi a livello di configurazione devi solo importare il modulo e (opzionalmente) passare la configurazione.
+
+#### NgModule
 
 ```ts
 import { PlDynamicFormModule, provideDynamicFormForModule } from 'pl-dynamicform';
@@ -96,23 +232,35 @@ import { PlDynamicFormModule, provideDynamicFormForModule } from 'pl-dynamicform
 export class AppModule {}
 ```
 
-### Standalone
+In alternativa, usa `forRoot()` (equivalente):
 
 ```ts
+@NgModule({
+  imports: [PlDynamicFormModule.forRoot({ matFormField: { appearance: 'outline' } })],
+})
+export class AppModule {}
+```
+
+#### Standalone
+
+```ts
+import { importProvidersFrom } from '@angular/core';
 import { PlDynamicFormModule, provideDynamicForm } from 'pl-dynamicform';
 
 // app.config.ts
 export const appConfig: ApplicationConfig = {
   providers: [
+    importProvidersFrom(PlDynamicFormModule), // necessario: inizializza font e stili runtime
     provideDynamicForm({
       matFormField: { appearance: 'fill' }, // override opzionale
     }),
-    importProvidersFrom(PlDynamicFormModule),
   ],
 };
 ```
 
-### Opzioni `matFormField`
+> ⚠️ `importProvidersFrom(PlDynamicFormModule)` è **obbligatorio** anche in standalone: è la costruzione del modulo a iniettare i font Material Icons e gli stili runtime.
+
+#### Opzioni `matFormField`
 
 | Proprietà            | Tipo                   | Default     | Descrizione                                  |
 | -------------------- | ---------------------- | ----------- | -------------------------------------------- |
@@ -120,6 +268,97 @@ export const appConfig: ApplicationConfig = {
 | `subscriptSizing`    | `'fixed' \| 'dynamic'` | `'fixed'`   | Gestione dello spazio per messaggi di errore |
 | `floatLabel`         | `'always' \| 'auto'`   | —           | Comportamento del label flottante            |
 | `hideRequiredMarker` | `boolean`              | —           | Nasconde l'asterisco obbligatorio            |
+
+---
+
+### 3. Configurazione SCSS / stili
+
+Questa è la parte che genera più confusione. Distinguere tra ciò che la libreria fa **da sola** e ciò che **devi fornire tu** nell'app host.
+
+#### Cosa fa già la libreria (non devi fare nulla)
+
+| Aspetto                                                                   | Gestito automaticamente                   | Come disabilitarlo                                                 |
+| ------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| Font **Material Icons / Symbols**                                         | ✅ link iniettato nel `<head>`            | `provideDynamicForm({ theme: { loadMaterialIcons: false } })`      |
+| **Tema interno** della libreria (token `--df-*`, overlay Material/CDK)    | ✅ `<style>` iniettato una volta          | `provideDynamicForm({ theme: { injectRuntimeStyles: false } })`    |
+| Classe tema (`df-theme-modern-light` / `df-theme-modern-dark`) sul `body` | ✅ applicata da `DynamicFormThemeService` | `theme: { applyToBody: false }` o `theme: { rootSelector: '...' }` |
+
+#### Cosa devi aggiungere tu in `styles.scss`
+
+La libreria **non** include un tema Angular Material né la griglia: questi vivono nell'app host e vanno aggiunti una volta nel file di stili globale (`src/styles.scss`):
+
+```scss
+/* 1. Tema Angular Material — OBBLIGATORIO.
+      Senza questo i mat-form-field, mat-select, mat-datepicker, ecc. risultano "rotti". */
+@use '@angular/material' as mat;
+
+html {
+  @include mat.core();
+
+  // Tema custom (consigliato)…
+  $theme: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+    )
+  );
+  @include mat.all-component-themes($theme);
+}
+
+/* 2. Griglia CSS — OBBLIGATORIA per il layout a colonne (row / col-* / g-0). */
+@use 'bootstrap/scss/bootstrap-grid';
+
+/* 3. (Facoltativo) override dei token del tema della libreria. */
+:root {
+  --df-primary: #2563eb;
+  --df-radius-md: 14px;
+}
+```
+
+In alternativa al tema custom, puoi usare un **tema prebuilt** Material (più rapido) tramite `angular.json`:
+
+```jsonc
+// angular.json → projects.<app>.architect.build.options.styles
+"styles": [
+  "@angular/material/prebuilt-themes/azure-blue.css", // tema Material prebuilt
+  "bootstrap/dist/css/bootstrap-grid.min.css",         // solo griglia (o bootstrap.min.css completo)
+  "src/styles.scss"
+]
+```
+
+> **Perché serve la griglia?** Il layout dei gruppi/campi usa classi Bootstrap (`row`, `g-0`, `col-12`, `col-md-6`, …) passate tramite il parametro `class` dei gruppi e dei campi. Senza una griglia che definisca queste classi, ogni campo occupa una riga intera.
+>
+> **Perché serve il tema Material?** Tutti i campi sono componenti Angular Material. La libreria tematizza solo le proprie estensioni (`--df-*`) e gli overlay, ma il rendering base dei componenti Material richiede un tema fornito dall'app.
+
+#### Esempio minimo completo di `styles.scss`
+
+```scss
+@use '@angular/material' as mat;
+@use 'bootstrap/scss/bootstrap-grid';
+
+html {
+  @include mat.core();
+  $theme: mat.define-theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$azure-palette,
+      ),
+    )
+  );
+  @include mat.all-component-themes($theme);
+}
+```
+
+#### Checklist rapida
+
+- [ ] `PlDynamicFormModule` importato (NgModule) o `importProvidersFrom(PlDynamicFormModule)` (standalone)
+- [ ] Tema Angular Material incluso (custom in `styles.scss` **oppure** prebuilt in `angular.json`)
+- [ ] Griglia CSS inclusa (`bootstrap-grid` o equivalente)
+- [ ] Material Icons: già caricati dalla libreria (nessuna azione, salvo disabilitazione esplicita)
 
 ---
 
@@ -793,6 +1032,59 @@ Upload file con validazione tipo e dimensione.
 
 ---
 
+### COLOR
+
+Selettore colore con supporto gradiente lineare. Il `FormControl` contiene una stringa CSS:
+- colore solido: es. `"#FF0000"`
+- gradiente: es. `"linear-gradient(90deg, #FF0000, #0000FF)"`
+
+```ts
+// Solido (gradiente abilitato di default)
+{
+  formName: 'colore_sfondo',
+  title: 'Colore sfondo',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl('#1976d2'),
+  resetButton: true,
+  hint: 'Seleziona colore o gradiente',
+}
+
+// Solo colore solido (gradiente disabilitato)
+{
+  formName: 'colore_testo',
+  title: 'Colore testo',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl('#000000'),
+  optionColor: { enableGradient: false },
+}
+
+// Gradiente con angolo predefinito
+{
+  formName: 'sfondo_gradiente',
+  title: 'Sfondo gradiente',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl('linear-gradient(135deg, #1976d2, #42a5f5)'),
+  optionColor: { enableGradient: true, defaultAngle: 135 },
+}
+```
+
+**opzioni `optionColor`:**
+
+| Proprietà       | Tipo      | Default | Descrizione                                |
+| --------------- | --------- | ------- | ------------------------------------------ |
+| `enableGradient`| `boolean` | `true`  | Mostra/nasconde la scheda gradiente        |
+| `defaultAngle`  | `number`  | `90`    | Angolo iniziale del gradiente (0–360 gradi)|
+
+**Comportamento:**
+
+- Click sul campo apre un pannello a tendina con selettore solido e (se abilitato) selettore gradiente
+- Modalità **Solido**: input nativo `type="color"` del browser
+- Modalità **Gradiente**: due color picker + slider angolo + anteprima live
+- Click fuori dal pannello chiude senza annullare la selezione corrente
+- `resetButton: true` mostra ✕ per azzerare il valore
+
+---
+
 ### BUTTON
 
 Bottone con azione custom inline nel form (diverso dalle azioni di gruppo).
@@ -1368,6 +1660,78 @@ function fetchUtenti(page: number, search: string, append: boolean) {
       },
       { injector: ctx['injector'], allowSignalWrites: true }
     );
+  },
+}))
+```
+
+---
+
+## Color — guida completa
+
+### Valore del FormControl
+
+Il componente `COLOR` memorizza il colore come **stringa CSS pura**:
+
+| Modalità | Esempio di valore                                      |
+| -------- | ------------------------------------------------------ |
+| Solido   | `"#1976d2"`                                            |
+| Gradiente| `"linear-gradient(90deg, #1976d2, #42a5f5)"`           |
+
+Questo semplifica la lettura e l'uso diretto nel CSS:
+
+```ts
+const sfondo: string = this.formGroup.get('colore')?.value;
+// uso diretto
+this.renderer.setStyle(el, 'background', sfondo);
+```
+
+### Configurazione completa
+
+```ts
+.addForm({
+  formName: 'tema_colore',
+  title: 'Tema cromatico',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl('linear-gradient(90deg, #1976d2, #42a5f5)'),
+  resetButton: true,
+  placeholder: 'Nessun colore selezionato',
+  hint: 'Puoi scegliere un colore solido o un gradiente lineare',
+  optionColor: {
+    enableGradient: true,   // abilita tab gradiente (default: true)
+    defaultAngle: 90,       // angolo iniziale slider
+  },
+  onChange: (_ig, _if, fc) => {
+    console.log('Colore selezionato:', fc.value);
+  },
+})
+```
+
+### Sola lettura
+
+Per mostrare il colore senza consentire modifiche, usa `disabled` nel `FormControl`:
+
+```ts
+{
+  formName: 'colore_brand',
+  title: 'Colore brand',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl({ value: '#1976d2', disabled: true }),
+  optionColor: { enableGradient: false },
+}
+```
+
+### Lettura del valore con onInitialize
+
+```ts
+.addForm(ctx => ({
+  formName: 'colore_sfondo',
+  title: 'Colore sfondo',
+  type: TYPE_CONTROL_FORM.COLOR,
+  formControl: new FormControl(null),
+  optionColor: { enableGradient: true },
+  onInitialize: (_ig, _if, fc) => {
+    // carica valore salvato dal backend
+    ctx.myService.getColor().subscribe(c => fc.setValue(c));
   },
 }))
 ```

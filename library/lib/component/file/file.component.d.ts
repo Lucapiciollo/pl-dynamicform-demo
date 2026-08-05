@@ -10,6 +10,15 @@ export declare class FileComponent extends BaseComponent implements AfterViewIni
     fileInput: ElementRef<HTMLInputElement>;
     constructor(injector: Injector, element: ElementRef);
     ngAfterViewInit(): void;
+    /**
+     * L'input di visualizzazione (readonly, [value]="getFileLabel()") non è collegato
+     * al form control reale tramite [formControl]/ngControl, quindi MatFormField non può
+     * rilevare automaticamente Validators.required e non mostra mai l'asterisco (bug:
+     * allegati obbligatori senza asterisco nelle modali). Esponiamo lo stato required
+     * qui e lo leghiamo con [required] sull'input, così MatFormField mostra il marker
+     * standard esattamente come per gli altri campi.
+     */
+    isRequired(): boolean;
     getFileLabel(): string;
     onFileChange(event: Event): void;
     clearFile(input: HTMLInputElement): void;

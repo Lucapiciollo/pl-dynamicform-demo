@@ -65,7 +65,8 @@ export declare enum TYPE_CONTROL_FORM {
     SORTACTION = 17,
     YEAR = 18,
     RATING = 19,
-    LABEL = 20
+    LABEL = 20,
+    COLOR = 21
 }
 /***********************************************************************************************************************************
  * BASE TYPES
@@ -73,10 +74,17 @@ export declare enum TYPE_CONTROL_FORM {
 export type TypeOptionRating = {
     max?: number;
 };
+export type TypeOptionColor = {
+    /** Abilita la modalità gradiente (default: true) */
+    enableGradient?: boolean;
+    /** Angolo predefinito del gradiente in gradi (default: 90) */
+    defaultAngle?: number;
+};
 export type TypeOptionDate = {
     max?: string;
     min?: string;
     onClose?: (value: any, formgroup: FormGroup) => void;
+    showArrows?: boolean;
 };
 export type TypeOptionTime = {
     max?: string;
@@ -87,9 +95,34 @@ export type TypeOptionNumber = {
     min?: number;
     step?: number;
 };
+/**
+ * Configurazione della maschera di input, applicata tramite la direttiva
+ * `[mask]` di `ux-directives`.
+ */
+export type TypeInputMask = {
+    /**
+     * Pattern della maschera. Ogni occorrenza di `token` è una posizione
+     * digitabile, gli altri caratteri sono letterali di formattazione.
+     * Es. `'### ### ####'` oppure `'(###) ###-####'`.
+     */
+    pattern: string;
+    /** Regex dei caratteri ammessi per ogni token (default `'[a-zA-Z0-9]'`). */
+    allowedRegex?: RegExp | string;
+    /** Carattere token della maschera (default `'#'`). */
+    token?: string;
+    /** Se `true` il valore vuoto è considerato valido (default `true`). */
+    allowEmpty?: boolean;
+};
 export type TypeInputText = {
     maxlength?: number;
     password?: boolean;
+    autofocus?: boolean;
+    /**
+     * Maschera di input opzionale. Quando valorizzata, il campo TEXT applica
+     * la direttiva `[mask]` di `ux-directives` per formattare e validare il
+     * valore durante la digitazione.
+     */
+    mask?: TypeInputMask;
 };
 export type TypeCss = {
     iconCss?: string | Array<string>;
@@ -472,10 +505,38 @@ export type FormActionYear = FormActionBase & {
     readonly?: boolean;
     optionDate?: TypeOptionDate;
 };
+/** Stile visivo del DateRangeComponent. */
+export declare enum DateRangeStyle {
+    /** Calendario Material standard (comportamento di default). */
+    DEFAULT = "default",
+    /** UI a schede con i periodi calcolati automaticamente. */
+    CARD = "card"
+}
+/** Modalità di calcolo automatico dei periodi (usata solo con DateRangeStyle.CARD). */
+export declare enum DateRangePeriodMode {
+    /** Quindicine: 1→15 e 16→ultimo giorno del mese. */
+    FORTNIGHT = "fortnight",
+    /** Settimane: 7 giorni fissi per ogni periodo. */
+    WEEKLY = "weekly",
+    /** Mese intero: dal 1° all'ultimo giorno del mese. */
+    MONTHLY = "monthly"
+}
 export type FormActionDateRange = FormActionBase & {
     type?: TYPE_CONTROL_FORM.DATARANGE;
     readonly?: boolean;
     optionDate?: TypeOptionDate;
+    /** Stile visivo del componente.
+     * - `DateRangeStyle.DEFAULT` (default): apre il calendario Material standard.
+     * - `DateRangeStyle.CARD`: mostra la UI a schede con i periodi calcolati automaticamente.
+     *   Richiede che `dateRangePeriodMode` sia valorizzato.
+     */
+    dateRangeStyle?: DateRangeStyle;
+    /** Modalità di calcolo automatico dei periodi. Considerato SOLO se `dateRangeStyle = CARD`.
+     * - `DateRangePeriodMode.FORTNIGHT`: quindicine (1–15, 16–fine mese)
+     * - `DateRangePeriodMode.WEEKLY`: settimane di 7 giorni
+     * - `DateRangePeriodMode.MONTHLY`: mese intero
+     */
+    dateRangePeriodMode?: DateRangePeriodMode;
 };
 export type FormActionDateTime = FormActionBase & {
     type?: TYPE_CONTROL_FORM.DATETIME;
@@ -510,10 +571,14 @@ export type FormActionRating = FormActionBase & {
     type?: TYPE_CONTROL_FORM.RATING;
     optionRating?: TypeOptionRating;
 };
+export type FormActionColor = FormActionBase & {
+    type?: TYPE_CONTROL_FORM.COLOR;
+    optionColor?: TypeOptionColor;
+};
 /**
  * Unione finale.
  *
  * Manteniamo i tipi specifici perché i componenti possono usarli,
  * ma la base è abbastanza ampia da non rompere builder e vecchi form.
  */
-export type FormAction = FormActionComboPaginate | FormActionCombo | FormActionGeneric | FormActionTextArea | FormActionQuestion | FormActionNumber | FormActionText | FormActionCurrency | FormActionCheckbox | FormActionDateRange | FormActionDate | FormActionYear | FormActionDateTime | FormActionFile | FormActionTime | FormActionRating;
+export type FormAction = FormActionComboPaginate | FormActionCombo | FormActionGeneric | FormActionTextArea | FormActionQuestion | FormActionNumber | FormActionText | FormActionCurrency | FormActionCheckbox | FormActionDateRange | FormActionDate | FormActionYear | FormActionDateTime | FormActionFile | FormActionTime | FormActionRating | FormActionColor;

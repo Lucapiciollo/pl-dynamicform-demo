@@ -1,28 +1,24 @@
 /** @format */
 import { FormControl, FormGroup } from '@angular/forms';
-/************************************************************************************************************************************************************* */
 /**
- * @author @l.piciollo
- * @param formGroup
- * @param formName
- * @returns Array<string>
- * si occupa di controllare in un formGroup, gli errori di validazione riscontrati per un determinato controller
+ * @author luca.piciollo
+ * Messaggi di errore default per la validazione dei form.
+ * Possono essere sovrascritti dall'applicazione via ERROR_MESSAGE_CONFIG injection token.
  */
+/** Tipo per il dizionario messaggi di errore. */
+export type ErrorMessageConfig = Record<string, string>;
+/**
+ * Inizializza il registro dei messaggi di errore con la configurazione fornita dall'applicazione.
+ * Da chiamare nel costruttore di PlDynamicFormModule dopo aver ricevuto ERROR_MESSAGE_CONFIG.
+ * Le chiavi non presenti nella configurazione custom manterranno il valore di default.
+ */
+export declare function setErrorMessages(config: ErrorMessageConfig): void;
+/** Legge il dizionario attivo dei messaggi di errore (default + override app). */
+export declare function getErrorMessages(): ErrorMessageConfig;
+/************************************************************************************************************************************************************* */
 export declare function GetErrorForm(formGroup: FormGroup, formName: string): Array<string>;
 /************************************************************************************************************************************************************* */
-/**
- * @author @l.piciollo
- * @param formControl
- * @returns Array<string>
- * si occupa di controllare in un formControl, gli errori di validazione riscontrati
- */
 export declare function GetErrorFormControl(formControl: FormControl): Array<string>;
 /************************************************************************************************************************************************************* */
-/**
- * @author @l.piciollo
- * @param formControl
- * @returns Array<string>
- * si occupa di controllare in un formControl, gli errori di validazione riscontrati
- */
 export declare function GetErrorFormControlFromObj(objErrors: Object): Array<string>;
 /************************************************************************************************************************************************************* */
